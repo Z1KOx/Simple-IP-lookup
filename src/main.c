@@ -1,34 +1,28 @@
-#include <stdio.h>
-#include <curl/curl.h>
-
-#define CURL_ERROR(str, ...) fprintf(stderr, "[ERROR] " str, ##__VA_ARGS__)
+#include "communication.h"
 
 int main()
 {
-	char ip_address[20];
+	const char ip_address[25];
 
-	printf("Enter an IP address to lookup for: ");
-	scanf_s("%s", ip_address, (unsigned)_countof(ip_address));
+	printf("Enter an IP address to lookup for\n> ");
+	scanf_s("%s", ip_address, (unsigned int)_countof(ip_address));
+	printf("\n");
 
-	CURL* curl = curl_easy_init();
+	const char* buffer = getResponse(ip_address);
 
-	if (!curl) {
-		CURL_ERROR("Failed to initialize cURL.\n");
-		return 1;
+	if (buffer)
+	{
+		const char* types[9] = {
+			"ip", "hostname", "city", "region",
+			"country", "loc", "org", "postal",
+			"timezone"
+		};
+
+		for (int i = 0; i < 9; ++i)
+			printJson(buffer, types[i]);
+
+		free(buffer);
 	}
 
-	char url[256];
-	snprintf(url, sizeof(url), "https://ipinfo.io/%s/geo", ip_address);
-
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-	CURLcode res = curl_easy_perform(curl);
-
-	if (res != CURLE_OK) {
-		CURL_ERROR("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		return EXIT_FAILURE;
-	}
-
-	curl_easy_cleanup(curl);
-	return 0;
+	return EXIT_SUCCESS;
 }
