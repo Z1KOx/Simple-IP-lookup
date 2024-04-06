@@ -2,7 +2,7 @@
 
 #define CURL_ERROR(str, ...) fprintf(stderr, "[ERROR] " str, ##__VA_ARGS__)
 
-size_t write_callback(const char* ptr, const size_t size, const size_t nmemb, const void* userData)
+size_t writeCallback(const char* ptr, const size_t size, const size_t nmemb, const void* userData)
 {
 	const size_t realSize = size * nmemb;
 	char** responsePtr = (char**)userData;
@@ -37,7 +37,7 @@ char* getResponse(const char* ipAddress)
 
 	// Set cURL options
 	curl_easy_setopt(curl, CURLOPT_URL, url);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBuffer);
 
 	const CURLcode res = curl_easy_perform(curl); // Perform cURL request
